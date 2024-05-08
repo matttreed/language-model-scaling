@@ -1,0 +1,62 @@
+{
+    "10000000000000": {
+        "indices": {
+            "d_model": 596,
+            "num_layers": 1,
+            "num_heads": 12,
+            "batch_size": 0,
+            "learning_rate": 0
+        },
+        "loss": 10.529635753250123
+    },
+    "30000000000000": {
+        "indices": {
+            "d_model": 14,
+            "num_layers": 3,
+            "num_heads": 12,
+            "batch_size": 0,
+            "learning_rate": 0
+        },
+        "loss": 10.300245892830292
+    },
+    "60000000000000": {
+        "indices": {
+            "d_model": 8,
+            "num_layers": 3,
+            "num_heads": 4,
+            "batch_size": 0,
+            "learning_rate": 0
+        },
+        "loss": 9.764853627058834
+    },
+    "100000000000000": {
+        "indices": {
+            "d_model": 8,
+            "num_layers": 2,
+            "num_heads": 12,
+            "batch_size": 0,
+            "learning_rate": 0
+        },
+        "loss": 9.018300336591647
+    },
+    "300000000000000": {
+        "indices": {
+            "d_model": 8,
+            "num_layers": 5,
+            "num_heads": 12,
+            "batch_size": 0,
+            "learning_rate": 0
+        },
+        "loss": 7.727053650809275
+    },
+    "600000000000000": {
+        "indices": {
+            "d_model": 8,
+            "num_layers": 3,
+            "num_heads": 12,
+            "batch_size": 0,
+            "learning_rate": 0
+        },
+        "loss": 7.109543186456803
+    }
+}

@@ -1,0 +1,7 @@
+README.md
+setup.py
+cs336_scaling/__init__.py
+cs336_scaling.egg-info/PKG-INFO
+cs336_scaling.egg-info/SOURCES.txt
+cs336_scaling.egg-info/dependency_links.txt
+cs336_scaling.egg-info/top_level.txt

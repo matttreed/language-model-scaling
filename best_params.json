@@ -1,0 +1,52 @@
+{
+    "10000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 24,
+            "num_heads": 16,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 10.504495683085041
+    },
+    "30000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 2,
+            "num_heads": 16,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 10.323533443288492
+    },
+    "60000000000000": {
+        "values": {
+            "d_model": 71,
+            "num_layers": 2,
+            "num_heads": 16,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 9.714867187623547
+    },
+    "100000000000000": {
+        "values": {
+            "d_model": 77,
+            "num_layers": 2,
+            "num_heads": 5,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 8.98356692274047
+    },
+    "300000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 2,
+            "num_heads": 7,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 7.763193636630521
+    }
+}
