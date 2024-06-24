@@ -6,6 +6,8 @@ import math
 from skopt import gp_minimize
 from skopt.space import Real, Integer, Categorical
 from skopt.utils import use_named_args
+import numpy as np
+import matplotlib.pyplot as plt
 
 API_KEY = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJaiXgI3BG+mtmm3aagRe3T8kYO0cesB7/qKHcB8K8AYmql4bcZ2rJW4wkt/yeVstItD+yvzLhstXoYea5XvlEMZw4zxrNVqxL0QmK157eeZtJFVtZRJ4vfnHgvMsU8lumLfV49qK+W9IjsgdlrlTzo8u6pHASPIA8MIxrX15ARz36TS4r4b18jKPOL7HJNwGG9r5Hl/nffkR9AZyrlilzckiCYhw6wjBpMumgbR+yxy11bFwn29d1czWW4JjcQ6YqR+aFDtzqCfKibE2YAHal18iVdybShupaPFe+gGL24JvqlixDUSSkSJMX9SDv/xEFSkHFBGdtMr3iCP077IgQ8f3d1eSgRpVpVeDXh7xyP5gpe9Bb1jv4B2Y4l5fT8/VALmuHNjk5kJWkVUbHgGWR4oGUe+5WFyTeGTc9Asl3NQJII/qHowLirFmbQME5R9NqATBDKs8qlZwCGlmyz9pfSOEIhjRYm2FFyKc2zJ7dyMrw/gqH33ANEr884KNxsGKRy3kPRqk93ZhuEIc5qdB+wno1u3DpH7G+TG1HcR02H7GvI//bfvu3BSzF6z80tt7e4w2oZhnEsWyUqjTtv33qaFapyxzonSbD7oGpx2i/uMTCB9itzqPW3Fmrt4HkkLsgdel20kyPyeJVgyqmL/CaNGhsLyGQJZur6g2YKmgtqw== mattreed@stanford.edu"
 FLOP_LIMIT = 2e18
@@ -17,6 +19,8 @@ BATCH_SIZE_CHOICES = [128, 256]
 LEARNING_RATE_CHOICES = [1e-3, 1e-4]
 # FLOPS_CHOICES = [1e13, 3e13, 6e13, 1e14, 3e14, 6e14]
 FLOPS_CHOICES = [1e13, 3e13, 6e13, 1e14, 3e14, 6e14, 1e15, 3e15, 6e15, 1e16, 3e16, 6e16, 1e17, 3e17, 6e17, 1e18]
+
+(1024-64) * (24-2) * (16-2) * 2 * 2
 
 CHOICES_DICT = {
     "d_model": D_MODEL_CHOICES,
@@ -203,7 +207,7 @@ def cardinal_hyperparameter_search(flops):
     print("Iterations:", iterations)
     print("Total FLOPS used:", iterations * flops)
 
-def save_values(model_values, flops, loss):
+def save_values(model_values, flops, loss, n_calls):
     print(f"Saving values {model_values} for {flops} with loss {loss}")
     with open("best_params.json", "r") as f:
         data = json.load(f)
@@ -215,10 +219,26 @@ def save_values(model_values, flops, loss):
             
         data[str(flops)] = {
             "values": model_values,
-            "loss": loss
+            "loss": loss,
+            "calls": n_calls
         }
     with open("best_params.json", "w") as f:
         json.dump(data, f, indent=4)
+
+def get_seeds(flops):
+    num_params = 1.16 * (flops ** 0.47)
+    d_model = (num_params * 125/16) ** (1/3)
+    num_layers = d_model / 125
+    num_heads = d_model / 64
+    batch_size = 256
+    learning_rate = 1e-3
+    return [[
+        max(min(int(d_model), 1024), 64), 
+        max(min(int(num_layers), 24), 2),
+        max(min(int(num_heads), 16), 2),
+        batch_size, 
+        learning_rate
+        ]]
 
 def baysian_search(flops, n_calls=10):
     cost = n_calls * flops
@@ -228,9 +248,6 @@ def baysian_search(flops, n_calls=10):
     if input() != "y":
         print("Exiting")
         return
-    
-    if cost_percent > 3:
-        raise ValueError("TOO MANY FLOPS")
 
     space = [
         Integer(64, 1024, name='d_model'),
@@ -239,6 +256,11 @@ def baysian_search(flops, n_calls=10):
         Categorical([128, 256], name='batch_size'),
         Categorical([1e-3, 1e-4], name='learning_rate')
     ]
+
+    x0 = get_seeds(flops)
+
+    if cost_percent > 15:
+        raise ValueError("TOO MANY FLOPS")
 
     @use_named_args(space)
     def objective(**params):
@@ -252,7 +274,7 @@ def baysian_search(flops, n_calls=10):
             flops
         )
 
-    result = gp_minimize(objective, space, n_calls=n_calls, random_state=0, n_initial_points=max(1, n_calls // 5))
+    result = gp_minimize(objective, space, n_calls=n_calls, x0=x0, n_initial_points=0)
 
     best_params = result.x
     best_loss = float(result.fun)
@@ -265,7 +287,45 @@ def baysian_search(flops, n_calls=10):
         "learning_rate": float(best_params[4])
     }
 
-    save_values(best_params_dict, flops, best_loss)
+    save_values(best_params_dict, flops, best_loss, n_calls)
+
+def plot():
+    with open("best_params.json", "r") as f:
+        data = json.load(f)
+
+    for key in ["d_model", "num_layers", "num_heads", "batch_size", "learning_rate", "loss"]:
+        x = np.array([int(flops) for flops in data])
+        y = np.array([data[flops]["values"][key] for flops in data]) if key != "loss" else np.array([data[flops][key] for flops in data])
+        log_x = np.log10(x)
+        log_y = np.log10(y)
+
+        coefficients = np.polyfit(log_x, log_y, 1)
+        poly = np.poly1d(coefficients)
+
+        m = coefficients[0]
+        b = coefficients[1]
+
+        equation = f'y = {10**b:.2e} * x^{m:.2f}'
+
+        print(f"Equation of the line for {key}:", equation)
+        x_values = [1e19]
+        y_predicted = 10**poly(np.log10(x_values))
+        print("Predicted y values for x = 1e19:", y_predicted)
+
+        x_min_max = [6e12, 2e19]
+
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.title(f"Optimal {key} Scaling Curve")
+        
+        plt.scatter(x, y, label=f'Optimal {key} for Each Compute Budget')
+        plt.plot(x_min_max, 10**poly(np.log10(x_min_max)), color='red', label='Scaling Curve Fit')
+        plt.scatter(x_values, y_predicted, label='Extrapolated Optimal Value for 1e19 FLOPS')
+        plt.xlabel('Compute Budget (FLOPs)')
+        plt.ylabel(f'Optimal {key}')
+        plt.legend()
+        # plt.ylim([2e-4, 2e-3])
+        plt.show()
 
 
 def get_remaining_flops():
@@ -283,6 +343,7 @@ def main():
     parser.add_argument('--search', action="store_true", help='Remaining FLOPS')
     parser.add_argument('--cardinal', action="store_true", help='Remaining FLOPS')
     parser.add_argument('--baysian', action="store_true", help='Remaining FLOPS')
+    parser.add_argument('--plot', action="store_true", help='Remaining FLOPS')
     parser.add_argument("-d", "--d_model", type=int, choices=D_MODEL_CHOICES, help="Dimensionality of the model (between 64 and 1024)")
     parser.add_argument("-l", "--num_layers", type=int, choices=NUM_LAYERS_CHOICES, help="Number of layers in the model (between 2 and 24)")
     parser.add_argument("-n", "--num_heads", type=int, choices=NUM_HEADS_CHOICES, help="Number of attention heads (between 2 and 16)")
@@ -292,6 +353,7 @@ def main():
     parser.add_argument("--n_calls", type=int, default=1, help="Number of calls to loss function (for baysian search)")
 
 
+
     random.seed(0)
 
     args = parser.parse_args()
@@ -299,6 +361,13 @@ def main():
     if args.status:
         get_remaining_flops()
     elif args.loss:
+        cost = args.train_flops
+        cost_percent = cost / FLOP_LIMIT * 100
+        print(f"Cost is {cost} ({cost_percent:.4f}%)")
+        print("Do you wish continue? (y/n)")
+        if input() != "y":
+            print("Exiting")
+            return
         get_loss(args.d_model, args.num_layers, args.num_heads, args.batch_size, args.learning_rate, int(args.train_flops))
     elif args.search:
         gradient_descent_hyperparameter_search(int(args.train_flops))
@@ -306,6 +375,8 @@ def main():
         cardinal_hyperparameter_search(int(args.train_flops))
     elif args.baysian:
         baysian_search(int(args.train_flops), args.n_calls)
+    elif args.plot:
+        plot()
 
 if __name__ == '__main__':
     main()

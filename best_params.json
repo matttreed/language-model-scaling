@@ -2,22 +2,24 @@
     "10000000000000": {
         "values": {
             "d_model": 64,
-            "num_layers": 24,
-            "num_heads": 16,
+            "num_layers": 7,
+            "num_heads": 3,
             "batch_size": 128,
             "learning_rate": 0.001
         },
-        "loss": 10.504495683085041
+        "loss": 10.502401498488721,
+        "calls": 100
     },
     "30000000000000": {
         "values": {
-            "d_model": 64,
-            "num_layers": 2,
-            "num_heads": 16,
+            "d_model": 82,
+            "num_layers": 3,
+            "num_heads": 2,
             "batch_size": 128,
             "learning_rate": 0.001
         },
-        "loss": 10.323533443288492
+        "loss": 10.310908835770963,
+        "calls": 20
     },
     "60000000000000": {
         "values": {
@@ -27,26 +29,128 @@
             "batch_size": 128,
             "learning_rate": 0.001
         },
-        "loss": 9.714867187623547
+        "loss": 9.714867187623547,
+        "calls": 20
     },
     "100000000000000": {
         "values": {
-            "d_model": 77,
+            "d_model": 64,
             "num_layers": 2,
-            "num_heads": 5,
+            "num_heads": 8,
             "batch_size": 128,
             "learning_rate": 0.001
         },
-        "loss": 8.98356692274047
+        "loss": 8.969154962635859,
+        "calls": 20
     },
     "300000000000000": {
         "values": {
-            "d_model": 64,
-            "num_layers": 2,
-            "num_heads": 7,
+            "d_model": 81,
+            "num_layers": 4,
+            "num_heads": 2,
             "batch_size": 128,
             "learning_rate": 0.001
         },
-        "loss": 7.763193636630521
+        "loss": 7.714471540197861,
+        "calls": 20
+    },
+    "600000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 9,
+            "num_heads": 16,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 7.1018225125710535,
+        "calls": 20
+    },
+    "1000000000000000": {
+        "values": {
+            "d_model": 68,
+            "num_layers": 8,
+            "num_heads": 16,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 6.73715123565697,
+        "calls": 50
+    },
+    "3000000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 20,
+            "num_heads": 16,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 6.128856279341923,
+        "calls": 20
+    },
+    "6000000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 2,
+            "num_heads": 2,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 5.881101790226316,
+        "calls": 5
+    },
+    "10000000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 2,
+            "num_heads": 2,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 5.702473622329341,
+        "calls": 5
+    },
+    "30000000000000000": {
+        "values": {
+            "d_model": 64,
+            "num_layers": 23,
+            "num_heads": 4,
+            "batch_size": 128,
+            "learning_rate": 0.001
+        },
+        "loss": 4.953234690460201,
+        "calls": 5
+    },
+    "60000000000000000": {
+        "values": {
+            "d_model": 886,
+            "num_layers": 7,
+            "num_heads": 13,
+            "batch_size": 256,
+            "learning_rate": 0.001
+        },
+        "loss": 5.089936338631761,
+        "calls": 5
+    },
+    "100000000000000000": {
+        "values": {
+            "d_model": 960,
+            "num_layers": 7,
+            "num_heads": 15,
+            "batch_size": 256,
+            "learning_rate": 0.001
+        },
+        "loss": 4.745208486135156,
+        "calls": 3
+    },
+    "300000000000000000": {
+        "values": {
+            "d_model": 1024,
+            "num_layers": 9,
+            "num_heads": 16,
+            "batch_size": 256,
+            "learning_rate": 0.001
+        },
+        "loss": 4.231640643786279,
+        "calls": 1
     }
 }
